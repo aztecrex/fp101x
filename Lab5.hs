@@ -29,7 +29,7 @@ action (Concurrent f) = f $ const Stop
 -- ===================================
 
 stop :: Concurrent a
-stop = Concurrent $ \_ -> Stop
+stop = Concurrent $ const Stop
 
 
 -- ===================================
@@ -91,7 +91,12 @@ instance Monad Concurrent where
 -- ===================================
 
 roundRobin :: [Action] -> IO ()
-roundRobin = error "You have to implement roundRobin"
+roundRobin [] = return ()
+roundRobin (Stop : xs) = roundRobin xs
+roundRobin (Fork a b : xs) = roundRobin $ a : b : xs
+roundRobin (Atom ioa : xs) = do
+  a <- ioa
+  roundRobin $ xs ++ [a]
 
 -- ===================================
 -- Tests
