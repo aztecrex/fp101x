@@ -82,8 +82,7 @@ capply :: (a -> Concurrent b) -> a -> ((b -> Action) -> Action)
 capply f = cunpack . f
 
 instance Monad Concurrent where
-    (>>=) m f = let ma = cunpack m
-                in cpack $ \h -> ma $ \j -> capply f j h
+    (>>=) m f = cpack $ \h -> cunpack m $ \j -> capply f j h
     return = pure
 
 
